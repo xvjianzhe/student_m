@@ -1,9 +1,10 @@
 
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from "axios";
+import logger from "@/log/baselog";
 
 const Api = axios.create({
-    baseURL: 'http://localhost:8080',
-    timeout:1000,
+    baseURL: 'http://localhost:8888',
+    timeout: 5000,
     headers: {
         'content-type': 'application/json'
     }
@@ -19,6 +20,7 @@ Api.interceptors.response.use(defaultResponseInterceptors, defaultResponseError)
  * @param error
  */
 function defaultRequestError(error: AxiosError): AxiosError {
+    logger.info('defaultRequestError 执行')
     return error
 }
 
@@ -27,7 +29,7 @@ function defaultRequestError(error: AxiosError): AxiosError {
  * @param value
  */
 function defaultRequestInterceptors(value: AxiosRequestConfig) {
-    console.log(value);
+    logger.info('defaultRequestInterceptors 执行')
     return value;
 }
 
@@ -36,6 +38,7 @@ function defaultRequestInterceptors(value: AxiosRequestConfig) {
  * @param error
  */
 function defaultResponseError(error: AxiosError): AxiosError {
+    logger.info('defaultResponseError 执行',error)
     return error;
 }
 
@@ -44,7 +47,7 @@ function defaultResponseError(error: AxiosError): AxiosError {
  * @param resp
  */
 function defaultResponseInterceptors(resp: AxiosResponse) : AxiosResponse| void {
-    console.log(resp)
+    logger.info('defaultResponseInterceptors 执行')
     return resp
 }
 
