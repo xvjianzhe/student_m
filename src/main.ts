@@ -16,3 +16,4 @@ app.mount('#app');
 
 app.config.globalProperties.$log = logger;
 app.config.globalProperties.$http = Api
+

@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import store from "@/store";
+import logger from "@/log/baselog";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -28,6 +30,26 @@ const routes: Array<RouteRecordRaw> = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
-})
+});
+
+router.beforeEach((to,from) => {
+  logger.info("目的地址："+to.path);
+  if (!store.state.isLogin) {
+    if (to.path === "/auth") {
+      return true;
+    } else {
+      logger.info("用户未登录, 即将跳转登录页面");
+      router.push({path:"auth"});
+      return false;
+    }
+  } else {
+    if (to.path === "/auth") {
+      logger.info("用户已登录，回到上一页面");
+      router.back();
+      return false;
+    }
+    return true;
+  }
+});
 
 export default router

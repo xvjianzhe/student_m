@@ -8,12 +8,12 @@
     <el-form-item label="邮箱：" prop="mail">
       <el-input v-model="ruleForm.mail" />
     </el-form-item>
-    <el-form-item label="验证码" prop="code">
+    <el-form-item label="验证码" prop="code" >
       <el-input v-model="ruleForm.code" />
     </el-form-item>
-    <el-button @click="onSendMail">发送验证码</el-button>
+    <el-button @click="onSendMail" :loading-icon="Eleme" :loading="isLoading" :disabled="formDisable">发送验证码</el-button>
     <el-form-item>
-      <el-button type="primary" @click="onSubmit">登录</el-button>
+      <el-button type="primary" :loading-icon="Eleme" @click="onSubmit" :loading="isSubmitting" :disabled="codeDisable">登录</el-button>
     </el-form-item>
   </el-form>
 </template>
@@ -22,9 +22,8 @@
 
 import {defineComponent, reactive, ref} from "vue";
 import {AuthSendMailCode,AuthByEmailCode,AuthBaseRegisterReq} from "@/api/auth";
-import {FormInstance, FormRules} from "element-plus";
-import logger from "@/log/baselog";
-
+import {FormInstance, FormItemInstance, FormRules} from "element-plus";
+import { Eleme } from '@element-plus/icons-vue'
 
 export default defineComponent({
   name: "AuthView",
@@ -32,6 +31,7 @@ export default defineComponent({
 
     const ruleFormRef = ref<FormInstance>();
     const formSize = ref('default');
+
     const ruleForm = reactive({
       mail: '',
       code: '',
@@ -44,7 +44,25 @@ export default defineComponent({
         {required: true, message: '请输入验证码', trigger: 'blur'},
         {len: 6, message: '验证码不能少于6位', trigger: 'blur' },
       ]
-    })
+    });
+
+    const validForm = async (formRef: FormInstance) => {
+      if (formRef) {
+        return await formRef.validate((valid) => {
+            return valid;
+        });
+      }
+      return false;
+    };
+
+    const validCode = async (formRef: FormInstance) => {
+      if (formRef) {
+        return await formRef.validateField("mail", (valid) => {
+          return valid;
+        });
+      }
+      return false;
+    };
 
     const sendMail = async ()=> {
       return await AuthSendMailCode(ruleForm.mail)
@@ -54,6 +72,9 @@ export default defineComponent({
       return await AuthByEmailCode(new AuthBaseRegisterReq(ruleForm.mail, ruleForm.code))
     };
     return {
+      validCode,
+      validForm,
+      Eleme,
       formSize,
       ruleFormRef,
       rules,
@@ -62,18 +83,25 @@ export default defineComponent({
       authByCode
     }
   },
+  data(){
+    return {
+      isSubmitting: false,
+      isLoading: false,
+    }
+  },
   methods: {
     onSubmit(){
 
       if (this.ruleFormRef) {
-        this.ruleFormRef.validate((valid, fields) => {
-          if (valid) {
-            logger.info('submit!')
+        this.validForm(this.ruleFormRef).then(val => {
+          if (val) {
+            this.$log.info("满足提交条件");
+            this.isSubmitting = true;
             this.authByCode().then(val=> {
               this.$log.info(val.data);
+            }).finally(()=>{
+              this.isSubmitting = false;
             });
-          } else {
-            logger.info('error submit!', fields)
           }
         });
       }
@@ -81,17 +109,17 @@ export default defineComponent({
 
     onSendMail(){
       if (this.ruleFormRef) {
-        this.ruleFormRef.validateField("mail",(valid, fields) => {
-          if (valid) {
-            logger.info('submit!');
+        this.validCode(this.ruleFormRef).then(val => {
+          if(val) {
+            this.$log.info("满足发送验证码条件");
+            this.isLoading = true;
             this.sendMail().then(val => {
               this.$log.info(val.data);
+            }).finally(()=>{
+              this.isLoading = false;
             });
-          } else {
-            logger.info('error code!');
-            logger.info(fields);
           }
-        })
+        });
       }
     }
   }
