@@ -1,4 +1,5 @@
 import baseApi from "@/api/baseApi";
+import store from "@/store";
 
 
 export function AuthSendMailCode(mail: string){
@@ -22,7 +23,12 @@ export function AuthByEmailCode(auth: AuthBaseRegisterReq) {
     return baseApi.post(
         '/auth/authByEmailCode',
         auth,
-    )
+    ).then(r => {
+        if (r.data) {
+            store.commit("setLogin", r.data.token)
+        }
+        return r.data.token;
+    });
 }
 
 export default {}

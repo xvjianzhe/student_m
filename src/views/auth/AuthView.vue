@@ -98,7 +98,8 @@ export default defineComponent({
             this.$log.info("满足提交条件");
             this.isSubmitting = true;
             this.authByCode().then(val=> {
-              this.$log.info(val.data);
+              this.$log.info("登录成功",val);
+              this.$router.push({path: "/"})
             }).finally(()=>{
               this.isSubmitting = false;
             });

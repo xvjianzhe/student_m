@@ -5,7 +5,9 @@
       <el-container>
         <el-aside width="200px"><MainMenu/></el-aside>
         <el-container>
-          <el-main>Main</el-main>
+          <el-main>Main
+          <el-button @click="sendMail">测试token</el-button>
+          </el-main>
           <el-footer>Footer</el-footer>
         </el-container>
       </el-container>
@@ -17,6 +19,11 @@
 
 import {defineComponent, reactive} from "vue";
 import MainMenu from "@/components/MainMenu.vue";
+import store from "@/store";
+import {useStore} from "vuex";
+import logger from "@/log/baselog";
+import {AuthSendMailCode} from "@/api/auth";
+import {GetDictType} from "@/api/sys";
 
 export default defineComponent({
   name: 'HomeView',
@@ -25,11 +32,20 @@ export default defineComponent({
 
   },
   setup(){
-    return {}
+    const sendMail = async ()=> {
+      return await GetDictType()
+    };
+
+    const store = useStore();
+    logger.info(store.getters.isLogin)
+    return {
+      sendMail
+    }
   },
   created() {
     this.$log.info('测试')
-  }
+  },
+
 
 });
 

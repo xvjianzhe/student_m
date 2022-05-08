@@ -1,6 +1,9 @@
 
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from "axios";
 import logger from "@/log/baselog";
+import {getStore} from "@/store";
+
+const store = getStore();
 
 const Api = axios.create({
     baseURL: 'http://localhost:8888',
@@ -29,6 +32,13 @@ function defaultRequestError(error: AxiosError): AxiosError {
  * @param value
  */
 function defaultRequestInterceptors(value: AxiosRequestConfig) {
+
+    if (store.state.isLogin) {
+        if (value.headers) {
+            value.headers.Auth = store.getters.getToken;
+            logger.info("用户已登录", JSON.stringify(value.headers))
+        }
+    }
     logger.info('defaultRequestInterceptors 执行')
     return value;
 }

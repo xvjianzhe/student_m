@@ -1,6 +1,25 @@
 <template>
   <router-view/>
 </template>
+<script>
+import {defineComponent} from "vue";
+
+export default defineComponent(
+    {
+      name: "app",
+      created(){
+        if (sessionStorage.getItem('store')) {
+          this.$store.replaceState(Object.assign({}, this.$store.state, JSON.parse(sessionStorage.getItem('store'))));
+        }
+        const store = this.$store;
+        window.addEventListener('beforeunload', ()=> {
+          sessionStorage.setItem('store', JSON.stringify(store.state))
+        })
+      }
+    },
+
+);
+</script>
 
 <style lang="scss">
 body,html{

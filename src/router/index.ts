@@ -1,7 +1,9 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import store from "@/store";
 import logger from "@/log/baselog";
+import {getStore} from "@/store";
+
+const store = getStore();
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -34,7 +36,8 @@ const router = createRouter({
 
 router.beforeEach((to,from) => {
   logger.info("目的地址："+to.path);
-  if (!store.state.isLogin) {
+  // const store = useStore();
+  if (!store.getters.isLogin) {
     if (to.path === "/auth") {
       return true;
     } else {
