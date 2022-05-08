@@ -35,7 +35,8 @@ function defaultRequestInterceptors(value: AxiosRequestConfig) {
 
     if (store.state.isLogin) {
         if (value.headers) {
-            value.headers.Auth = store.getters.getToken;
+            value.headers.Authorization = "BEARER "+store.getters.getToken;
+            // value.headers.Auth = store.getters.getToken;
             logger.info("用户已登录", JSON.stringify(value.headers))
         }
     }
